@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .user-info {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .actions a, .actions input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<main class="container mt-5">
+    <h1 class="mb-4">User  Details</h1>
+    <div class="user-info">
+        <p th:text="'ID: ' + ${user.id}">ID: VALUE</p>
+        <p th:text="'First Name: ' + ${user.firstName}">First Name: VALUE</p>
+        <p th:text="'Name: ' + ${user.name}">Name: VALUE</p>
+        <p th:text="'Last Name: ' + ${user.lastName}">Last Name: VALUE</p>
+        <p th:text="'Email: ' + ${user.email}">Email: VALUE</p>
+    </div>
+    <div class="actions">
+        <a class="btn btn-warning" th:href="'/admin/edit?id='+${user.id}">Edit</a>
+        <form th:method="DELETE" th:action="'/admin/delete?id='+${user.id}">
+            <input type="submit" class="btn btn-danger" value="Delete"/>
+        </form>
+    </div>
+</main>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-dark">
+    <span class="navbar-text text-white">
+        <b th:utext="${thisUser .getEmail()}"></b> with roles:
+        <span th:each="role : ${thisUser .getRoles()}" th:text="${role.getName()}"></span>
+    </span>
+    <a class="nav-link text-secondary font-weight-bold" href="/user/logout">Logout</a>
+</nav>
+
+<div class="row h-100">
+    <div class="col-2 bg-white list-group">
+        <ul class="nav nav-tabs my-2 flex-column nav-pills">
+            <li sec:authorize="hasRole('ROLE_ADMIN')" class="nav-item">
+                <a class="nav-link active" href="/admin">Admin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/user">User </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col my-3 mx-3">
+        <h2>Admin panel</h2>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="/admin">Users table</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/auth/registration">New User</a>
+            </li>
+        </ul>
+
+        <h1>All users</h1>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody th:each="user : ${listUser }">
+            <tr>
+                <td th:text="${user.getId()}"></td>
+                <td th:text="${user.getUsername()}"></td>
+                <td th:text="${user.getLastName()}"></td>
+                <td th:text="${user.getEmail()}"></td>
+                <td th:each="role : ${user.getRoles()}" th:text="${role.getName()}"></td>
+                <td><button type="button" class="btn btn-primary editUser " data-toggle="modal" data-target="#editModal">Edit</button></td>
+                <td><button type="button" class="btn btn-danger deleteUser " data-toggle="modal" data-target="#myModalDelete">Delete</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div id="editModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit user</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="formEditUser ">
+                    <input type="number" name="id" id="idInput" readonly class="form-control" placeholder="ID">
+                    <input type="text" name="firstName" id="firstNameInput" class="form-control" placeholder="Firstname">
+                    <input type="text" name="lastName" id="lastNameInput" class="form-control" placeholder="Lastname">
+                    <input type="email" name="email" id="emailInput" class="form-control" placeholder="Email">
+                    <input type="password" name="password" id="passwordInput" class="form-control" placeholder="Password">
+                    <select class="custom-select form-control" multiple name="role" id="roleInput">
+                        <option>ADMIN</option>
+                        <option>USER</option>
+                    </select>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary editBtn">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE USER MODAL -->
+<div id="myModalDelete" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete user</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="formDeleteUser ">
+                    <input type="number" name="id" id="idDelete" readonly class="form-control" placeholder="ID">
+                    <input type="text" name="firstName" id="firstNameDelete" readonly class="form-control" placeholder="Firstname">
+                    <input type="text" name="lastName" id="lastNameDelete" readonly class="form-control" placeholder="Lastname">
+                    <input type="email" name="email" id="emailDelete" readonly class="form-control" placeholder="Email">
+                    <input type="text" name="role" id="roleDelete" readonly class="form-control" placeholder="Role">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger deleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="/webjars/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+    const on = (element, event, selector, handler) => {
+        element.addEventListener(event, e => {
+            if (e.target.closest(selector)) {
+                handler(e);
+            }
+        });
+    };
+
+    // Edit user modal
+    on(document, 'click', '.editUser ', e => {
+        const row = e.target.closest('tr');
+        $('#idInput').val(row.children[0].textContent);
+        $('#firstNameInput').val(row.children[1].textContent);
+        $('#lastNameInput').val(row.children[2].textContent);
+        $('#emailInput').val(row.children[3].textContent);
+        $('#editModal').modal();
+    });
+
+    on(document, 'click', '.editBtn', () => {
+        $.ajax({
+            url: '/admin/edit?id=' + $('#idInput').val(),
+            method: 'PUT',
+            data: $(".formEditUser ").serialize(),
+            success: () => window.location.href = "/admin",
+            error: () => window.location.href = "/admin",
+        });
+    });
+
+    // Delete user modal
+    on(document, 'click', '.deleteUser  ', e => {
+        const row = e.target.closest('tr');
+        $('#idDelete').val(row.children[0].textContent);
+        $('#firstNameDelete').val(row.children[1].textContent);
+        $('#lastNameDelete').val(row.children[2].textContent);
+        $('#emailDelete').val(row.children[3].textContent);
+        $('#roleDelete').val(row.children[4].textContent);
+        $('#myModalDelete').modal();
+    });
+
+    on(document, 'click', '.deleteBtn', () => {
+        $.ajax({
+            url: '/admin/delete?id=' + $('#idDelete').val(),
+            method: 'DELETE',
+            success: () => window.location.href = "/admin",
+            error: () => window.location.href = "/admin",
+        });
+    });
+</script>
+
+</body>
+</html>
